@@ -410,7 +410,7 @@ foreach ($wtPath in $wtPaths) {
             $wt.profiles.defaults.font | Add-Member -NotePropertyName "face" -NotePropertyValue $fontFace -Force
 
             $wt | ConvertTo-Json -Depth 20 | Set-Content $wtPath -Encoding UTF8
-            Write-Ok "$wtName: fonte '$fontFace' configurada no perfil padrão"
+            Write-Ok "${wtName}: fonte '$fontFace' configurada no perfil padrão"
             $report += "$wtName`: fonte configurada"
             $wtConfigured = $true
         } catch {
@@ -447,21 +447,21 @@ foreach ($vsPath in $vscodePaths) {
 
             # Verificar se já tem a fonte configurada
             if ($vsRaw -match "terminal\.integrated\.fontFamily.*$([regex]::Escape($fontFaceMono))") {
-                Write-Skip "$vsName: fonte '$fontFaceMono' já configurada"
+                Write-Skip "${vsName}: fonte '$fontFaceMono' já configurada"
                 $report += "$vsName`: já configurado"
             } elseif ($vsRaw -match '"terminal\.integrated\.fontFamily"') {
                 # Atualizar fonte existente
                 $vsNew = $vsRaw -replace '("terminal\.integrated\.fontFamily"\s*:\s*)"[^"]*"', "`$1`"$fontFaceMono`""
                 Set-Content -Path $vsPath -Value $vsNew -Encoding UTF8
-                Write-Ok "$vsName: fonte atualizada para '$fontFaceMono'"
+                Write-Ok "${vsName}: fonte atualizada para '$fontFaceMono'"
                 $report += "$vsName`: fonte atualizada"
             } else {
-                Write-Detail "$vsName: adicione manualmente nas configurações:"
+                Write-Detail "${vsName}: adicione manualmente nas configurações:"
                 Write-Detail "  `"terminal.integrated.fontFamily`": `"$fontFaceMono`""
                 $report += "$vsName`: configurar manualmente"
             }
         } catch {
-            Write-Err "$vsName: falha ao ler settings.json — $_"
+            Write-Err "${vsName}: falha ao ler settings.json — $_"
             $report += "$vsName`: falhou"
         }
     }
