@@ -11,7 +11,7 @@ Um comando configura tudo em qualquer máquina nova.
 | FiraCode Nerd Font | Fonte com ícones para o prompt |
 | PSReadLine | Autocomplete preditivo no PowerShell |
 | Clink | Suporte ao Oh My Posh no CMD |
-| Tema | M365Princess (customizável) |
+| Tema | bubbles (customizável) |
 
 ## Terminais configurados
 
@@ -59,11 +59,17 @@ Pronto. Feche e reabra todos os terminais.
 
 ## Trocar de tema
 
+Aplicar um tema diretamente por nome (baixa do GitHub se necessário):
+
+```powershell
+.\Set-Theme.ps1 -Name "bubbles"
+```
+
+Listar todos os temas disponíveis (customizados + built-in) interativamente:
+
 ```powershell
 .\Set-Theme.ps1
 ```
-
-Lista todos os temas disponíveis (customizados + built-in) e atualiza os profiles automaticamente.
 
 Para pré-visualizar sem aplicar:
 
@@ -79,7 +85,7 @@ OhMyPosh/
 ├── Set-Theme.ps1           # Troca rápida de tema
 ├── README.md
 ├── themes/
-│   ├── M365Princess.omp.json   # Tema padrão
+│   ├── bubbles.omp.json        # Tema padrão
 │   ├── clean-minimal.omp.json  # Tema minimalista
 │   └── powerline-dark.omp.json # Tema powerline escuro
 └── .claude/

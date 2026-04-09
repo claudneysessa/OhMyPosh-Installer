@@ -10,7 +10,7 @@
       - CMD (via Clink)
       - Windows Terminal (fonte)
       - VSCode terminal (fonte)
-    Tema padrão: M365Princess | Fonte padrão: FiraCode
+    Tema padrão: bubbles | Fonte padrão: FiraCode
 .EXAMPLE
     .\Setup-OhMyPosh.ps1
     .\Setup-OhMyPosh.ps1 -Theme "agnoster" -Font "CascadiaCode"
@@ -18,7 +18,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$Theme = "M365Princess",
+    [string]$Theme = "bubbles",
     [string]$Font  = "FiraCode",
     [switch]$SkipFont,
     [switch]$SkipClink
