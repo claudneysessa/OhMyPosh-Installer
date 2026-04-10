@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Troca rápida de tema do Oh My Posh.
 .DESCRIPTION
@@ -41,6 +41,78 @@ if ($Preview) {
         Write-Host "Tema '$Preview' não encontrado." -ForegroundColor Red
         return
     }
+}
+
+# ── Aplicar tema por nome (-Name) ──────────────────────────────────
+if ($Name) {
+    $themePath = $null
+
+    # Tentar tema customizado
+    $candidates = Get-ChildItem -Path $themesDir -Filter "*$Name*" -ErrorAction SilentlyContinue
+    if ($candidates) {
+        $themePath = $candidates[0].FullName
+    }
+
+    # Tentar tema built-in
+    if (-not $themePath) {
+        $builtinDir = if ($env:POSH_THEMES_PATH) { $env:POSH_THEMES_PATH } else { Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes" }
+        $builtinPath = Join-Path $builtinDir "$Name.omp.json"
+        if (Test-Path $builtinPath) { $themePath = $builtinPath }
+    }
+
+    # Baixar do GitHub se nao encontrado localmente
+    if (-not $themePath) {
+        Write-Host "Baixando tema '$Name' do GitHub..." -ForegroundColor Cyan
+        if (-not (Test-Path $themesDir)) { New-Item -ItemType Directory -Path $themesDir -Force | Out-Null }
+        $downloadPath = Join-Path $themesDir "$Name.omp.json"
+        try {
+            $url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$Name.omp.json"
+            Invoke-WebRequest -Uri $url -OutFile $downloadPath -UseBasicParsing
+            $themePath = $downloadPath
+            Write-Host "Tema baixado: $downloadPath" -ForegroundColor Green
+        } catch {
+            Write-Host "Tema '$Name' nao encontrado." -ForegroundColor Red
+            return
+        }
+    }
+
+    Write-Host "Aplicando tema: $Name" -ForegroundColor Green
+
+    $profiles = @(
+        (Join-Path ([Environment]::GetFolderPath("MyDocuments")) "WindowsPowerShell\Microsoft.PowerShell_profile.ps1"),
+        (Join-Path ([Environment]::GetFolderPath("MyDocuments")) "PowerShell\Microsoft.PowerShell_profile.ps1")
+    )
+
+    $newInitLine = "oh-my-posh init pwsh --config '$themePath' | Invoke-Expression"
+
+    foreach ($prof in $profiles) {
+        if (-not (Test-Path $prof)) { continue }
+        $lines = Get-Content $prof
+        $updated = $false
+        $newLines = [System.Collections.Generic.List[string]]::new()
+        $replaced = $false
+        foreach ($line in $lines) {
+            if (($line -match "^oh-my-posh init pwsh") -or ($line -like "oh-my-posh\*")) {
+                if (-not $replaced) {
+                    $newLines.Add($newInitLine)
+                    $replaced = $true
+                }
+                # linhas corrompidas adicionais são descartadas
+            } else {
+                $newLines.Add($line)
+            }
+        }
+        if ($replaced) {
+            [System.IO.File]::WriteAllLines($prof, $newLines, [System.Text.Encoding]::UTF8)
+            Write-Host "  OK Atualizado: $prof" -ForegroundColor Green
+        } else {
+            Write-Host "  -- Oh My Posh nao encontrado em: $prof" -ForegroundColor Yellow
+        }
+    }
+
+    Write-Host ''
+    Write-Host 'Reinicie o terminal ou rode: . $PROFILE' -ForegroundColor Cyan
+    return
 }
 
 # ── Listar temas disponíveis ────────────────────────────────────────
@@ -107,24 +179,28 @@ $newInitLine = "oh-my-posh init pwsh --config '$themePath' | Invoke-Expression"
 foreach ($prof in $profiles) {
     if (-not (Test-Path $prof)) { continue }
 
-    $lines = Get-Content $prof
-    $updated = $false
-
-    for ($i = 0; $i -lt $lines.Count; $i++) {
-        if ($lines[$i] -match "^oh-my-posh init pwsh") {
-            $lines[$i] = $newInitLine
-            $updated = $true
-            break
+    $lines = [System.IO.File]::ReadAllLines($prof, [System.Text.Encoding]::UTF8)
+    $newLines = [System.Collections.Generic.List[string]]::new()
+    $replaced = $false
+    foreach ($line in $lines) {
+        if (($line -match "^oh-my-posh init pwsh") -or ($line -like "oh-my-posh\*")) {
+            if (-not $replaced) {
+                $newLines.Add($newInitLine)
+                $replaced = $true
+            }
+        } else {
+            $newLines.Add($line)
         }
     }
 
-    if ($updated) {
-        $lines | Set-Content $prof -Encoding UTF8
-        Write-Host "  ✓ Atualizado: $prof" -ForegroundColor Green
+    if ($replaced) {
+        [System.IO.File]::WriteAllLines($prof, $newLines, [System.Text.Encoding]::UTF8)
+        Write-Host "  OK Atualizado: $prof" -ForegroundColor Green
     } else {
-        Write-Host "  ⊘ Oh My Posh não encontrado em: $prof" -ForegroundColor Yellow
+        Write-Host "  -- Oh My Posh nao encontrado em: $prof" -ForegroundColor Yellow
     }
 }
 
-Write-Host "`nReinicie o terminal para aplicar o novo tema." -ForegroundColor Cyan
-Write-Host "Ou rode: . `$PROFILE" -ForegroundColor Gray
+Write-Host ''
+Write-Host 'Reinicie o terminal para aplicar o novo tema.' -ForegroundColor Cyan
+Write-Host 'Ou rode: . $PROFILE' -ForegroundColor Gray
