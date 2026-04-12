@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿# Recomendado executar como Administrador para instalar fontes e pacotes
 <#
 .SYNOPSIS
     Instalação e configuração automática do Oh My Posh em TODOS os terminais.
@@ -18,7 +18,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$Theme = "bubbles",
+    [string]$Theme = "lightgreen",
     [string]$Font  = "FiraCode",
     [switch]$SkipFont,
     [switch]$SkipClink
@@ -115,46 +115,52 @@ Write-Step "Resolvendo tema: $Theme..."
 $themeConfigWin  = $null  # Caminho para PowerShell/CMD (Windows paths)
 $themeConfigUnix = $null  # Caminho para Git Bash (Unix paths)
 
-# Verificar tema customizado na pasta themes/
+# Todos os temas ficam sempre em $ScriptRoot\themes\ (pasta local do projeto)
 $themesDir = Join-Path $ScriptRoot "themes"
-if (Test-Path $themesDir) {
-    $customMatch = Get-ChildItem -Path $themesDir -Filter "*$Theme*.omp.*" -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($customMatch) {
-        $themeConfigWin  = $customMatch.FullName
-        Write-Ok "Tema encontrado localmente: $($customMatch.Name)"
-    }
+if (-not (Test-Path $themesDir)) { New-Item -ItemType Directory -Path $themesDir -Force | Out-Null }
+
+# 1. Verificar se já existe na pasta local
+$customMatch = Get-ChildItem -Path $themesDir -Filter "*$Theme*.omp.*" -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($customMatch) {
+    $themeConfigWin = $customMatch.FullName
+    Write-Ok "Tema encontrado localmente: $($customMatch.Name)"
 }
 
-# Se não encontrou localmente, verificar nos built-in ou baixar do GitHub
+# 2. Se não encontrou localmente, copiar do built-in para a pasta local
 if (-not $themeConfigWin) {
-    # Tentar pasta de temas built-in (instalação non-MSIX)
     $ompThemesDir = Join-Path $env:LOCALAPPDATA "Programs\oh-my-posh\themes"
     $builtinPath  = Join-Path $ompThemesDir "$Theme.omp.json"
+    $localPath    = Join-Path $themesDir "$Theme.omp.json"
 
     if (Test-Path $builtinPath) {
-        $themeConfigWin = $builtinPath
-        Write-Ok "Tema built-in: $Theme"
-    } else {
-        # Instalação MSIX (winget): não tem temas locais, baixar do GitHub
-        Write-Step "Baixando tema '$Theme' do repositório oficial..."
-        $downloadPath = Join-Path $themesDir "$Theme.omp.json"
-        if (-not (Test-Path $themesDir)) { New-Item -ItemType Directory -Path $themesDir -Force | Out-Null }
-        try {
-            $url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$Theme.omp.json"
-            Invoke-WebRequest -Uri $url -OutFile $downloadPath -UseBasicParsing
-            $themeConfigWin = $downloadPath
-            Write-Ok "Tema baixado: $downloadPath"
-        } catch {
-            Write-Err "Falha ao baixar tema: $_"
-            Write-Detail "Baixe manualmente de: $url"
-            $themeConfigWin = $url
-            Write-Ok "Usando URL remota como fallback"
-        }
+        Copy-Item -Path $builtinPath -Destination $localPath -Force
+        $themeConfigWin = $localPath
+        Write-Ok "Tema built-in copiado para: $localPath"
     }
 }
 
-# Converter caminho Windows para Unix (Git Bash: C:\... → /c/...)
-$themeConfigUnix = ($themeConfigWin -replace '\\','/') -replace '^([A-Za-z]):',{ '/' + $_.Groups[1].Value.ToLower() }
+# 3. Se não encontrou em lugar nenhum, baixar do GitHub para a pasta local
+if (-not $themeConfigWin) {
+    Write-Step "Baixando tema '$Theme' do repositório oficial..."
+    $localPath = Join-Path $themesDir "$Theme.omp.json"
+    try {
+        $url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$Theme.omp.json"
+        Invoke-WebRequest -Uri $url -OutFile $localPath -UseBasicParsing
+        $themeConfigWin = $localPath
+        Write-Ok "Tema baixado: $localPath"
+    } catch {
+        Write-Err "Falha ao baixar tema: $_"
+        Write-Detail "Baixe manualmente de: $url"
+    }
+}
+
+# Converter caminho Windows para Unix (Git Bash: C:\... -> /c/...)
+$themeConfigFwd = $themeConfigWin -replace '\\','/'
+if ($themeConfigFwd -match '^([A-Za-z]):(.*)') {
+    $themeConfigUnix = '/' + $Matches[1].ToLower() + $Matches[2]
+} else {
+    $themeConfigUnix = $themeConfigFwd
+}
 
 # ═══════════════════════════════════════════════════════════════════
 # 4. POWERSHELL 5.1
@@ -298,7 +304,7 @@ eval "`$(oh-my-posh init bash --config '$themeConfigUnix')"
             $newBash = $bashContent -replace 'eval "\$\(oh-my-posh init bash --config ''.*?''\)"',
                                               "eval `"`$(oh-my-posh init bash --config '$themeConfigUnix')`""
             if ($newBash -ne $bashContent) {
-                Set-Content -Path $bashrcPath -Value $newBash -Encoding UTF8NoBOM
+                [System.IO.File]::WriteAllText($bashrcPath, $newBash, (New-Object System.Text.UTF8Encoding $false))
                 Write-Ok "Tema atualizado no .bashrc"
                 $report += "Git Bash: tema atualizado"
             } else {
@@ -306,12 +312,12 @@ eval "`$(oh-my-posh init bash --config '$themeConfigUnix')"
                 $report += "Git Bash: já configurado"
             }
         } else {
-            Add-Content -Path $bashrcPath -Value $bashOmpBlock -Encoding UTF8NoBOM
+            [System.IO.File]::AppendAllText($bashrcPath, $bashOmpBlock, (New-Object System.Text.UTF8Encoding $false))
             Write-Ok ".bashrc configurado"
             $report += "Git Bash: configurado"
         }
     } else {
-        Set-Content -Path $bashrcPath -Value $bashOmpBlock -Encoding UTF8NoBOM
+        [System.IO.File]::WriteAllText($bashrcPath, $bashOmpBlock, (New-Object System.Text.UTF8Encoding $false))
         Write-Ok ".bashrc criado e configurado"
         $report += "Git Bash: .bashrc criado"
     }
@@ -347,11 +353,9 @@ if (-not $SkipClink) {
         Write-Ok "Clink já instalado: $(clink --version 2>$null)"
     }
 
-    # Configurar oh-my-posh no Clink
-    $clinkExe = Get-Command clink.exe -ErrorAction SilentlyContinue
-    if ($clinkExe) {
-        # Determinar pasta de scripts do Clink
-        $clinkProfileDir = Join-Path $env:LOCALAPPDATA "clink"
+    # Configurar oh-my-posh no Clink (cria o script Lua independente do exe estar no PATH)
+    $clinkProfileDir = Join-Path $env:LOCALAPPDATA "clink"
+    if ($true) {
         if (-not (Test-Path $clinkProfileDir)) {
             New-Item -ItemType Directory -Path $clinkProfileDir -Force | Out-Null
         }
@@ -364,12 +368,9 @@ if (-not $SkipClink) {
 load(io.popen('oh-my-posh init cmd --config "$themeConfigWinEscaped"'):read("*a"))()
 "@
 
-        Set-Content -Path $clinkScriptPath -Value $clinkLua -Encoding UTF8NoBOM
+        [System.IO.File]::WriteAllText($clinkScriptPath, $clinkLua, (New-Object System.Text.UTF8Encoding $false))
         Write-Ok "Clink configurado: $clinkScriptPath"
         $report += "CMD (Clink): configurado"
-    } else {
-        Write-Err "Clink não disponível após instalação — configure manualmente"
-        $report += "CMD (Clink): falhou"
     }
 } else {
     Write-Skip "Configuração do Clink pulada (-SkipClink)"
@@ -414,7 +415,7 @@ foreach ($wtPath in $wtPaths) {
             $report += "$wtName`: fonte configurada"
             $wtConfigured = $true
         } catch {
-            Write-Err "$wtName`: falha ao configurar — $_"
+            Write-Err "${wtName}: falha ao configurar - $_"
             Write-Detail "Configure manualmente: Configurações → Padrões → Aparência → Fonte → '$fontFace'"
             $report += "$wtName`: falhou (configurar manualmente)"
         }
@@ -461,7 +462,7 @@ foreach ($vsPath in $vscodePaths) {
                 $report += "$vsName`: configurar manualmente"
             }
         } catch {
-            Write-Err "${vsName}: falha ao ler settings.json — $_"
+            Write-Err "${vsName}: falha ao ler settings.json - $_"
             $report += "$vsName`: falhou"
         }
     }
