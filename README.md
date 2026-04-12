@@ -27,7 +27,7 @@ Um comando configura tudo em qualquer máquina nova.
 ### 1. Clonar ou copiar esta pasta para a máquina
 
 ```
-E:\Powershell\OhMyPosh\
+C:\tools\OhMyPosh-Installer\
 ```
 
 ### 2. Executar o setup como Administrador

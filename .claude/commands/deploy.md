@@ -22,19 +22,19 @@ Executa a implantação completa do Oh My Posh em todos os terminais compatívei
 Execute o script de setup como administrador:
 
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File "e:/Powershell/OhMyPosh/Setup-OhMyPosh.ps1"
+powershell.exe -ExecutionPolicy Bypass -File "C:/tools/OhMyPosh-Installer/Setup-OhMyPosh.ps1"
 ```
 
 Se o usuário pedir para usar um tema diferente, passe o parâmetro `-Theme`:
 
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File "e:/Powershell/OhMyPosh/Setup-OhMyPosh.ps1" -Theme "nome-do-tema"
+powershell.exe -ExecutionPolicy Bypass -File "C:/tools/OhMyPosh-Installer/Setup-OhMyPosh.ps1" -Theme "nome-do-tema"
 ```
 
 Se o usuário pedir para trocar apenas o tema (sem reinstalar tudo), execute:
 
 ```powershell
-powershell.exe -ExecutionPolicy Bypass -File "e:/Powershell/OhMyPosh/Set-Theme.ps1"
+powershell.exe -ExecutionPolicy Bypass -File "C:/tools/OhMyPosh-Installer/Set-Theme.ps1"
 ```
 
 Após a execução, informe ao usuário que ele precisa reiniciar todos os terminais para ver as mudanças.

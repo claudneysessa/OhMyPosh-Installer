@@ -1,5 +1,5 @@
 # Find the closing quote area of line 125
-$bytes = [System.IO.File]::ReadAllBytes('e:/Powershell/installOhMyPosh/Set-Theme.ps1')
+$bytes = [System.IO.File]::ReadAllBytes((Join-Path $PSScriptRoot 'Set-Theme.ps1'))
 $text = [System.Text.Encoding]::UTF8.GetString($bytes)
 
 # Find line 125 byte offset

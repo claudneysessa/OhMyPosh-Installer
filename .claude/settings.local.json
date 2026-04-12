@@ -16,8 +16,8 @@
       "Bash(wsl.exe --list --verbose)",
       "Read(//c/Users/claud/**)",
       "Read(//c/Users/claud/AppData/Roaming/Code/User/**)",
-      "Bash(powershell.exe -NoProfile -Command 'try { [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content '\\\\''e:/Powershell/OhMyPosh/Setup-OhMyPosh.ps1'\\\\'' -Raw\\), [ref]$null\\) | Out-Null; Write-Host '\\\\''SYNTAX OK'\\\\'' } catch { Write-Host \"SYNTAX ERROR: $_\" }')",
-      "Bash(powershell.exe -NoProfile -Command 'try { [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content '\\\\''e:/Powershell/OhMyPosh/Set-Theme.ps1'\\\\'' -Raw\\), [ref]$null\\) | Out-Null; Write-Host '\\\\''SYNTAX OK'\\\\'' } catch { Write-Host \"SYNTAX ERROR: $_\" }')",
+      "Bash(powershell.exe -NoProfile -Command 'try { [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content '\\\\''C:/tools/OhMyPosh-Installer/Setup-OhMyPosh.ps1'\\\\'' -Raw\\), [ref]$null\\) | Out-Null; Write-Host '\\\\''SYNTAX OK'\\\\'' } catch { Write-Host \"SYNTAX ERROR: $_\" }')",
+      "Bash(powershell.exe -NoProfile -Command 'try { [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content '\\\\''C:/tools/OhMyPosh-Installer/Set-Theme.ps1'\\\\'' -Raw\\), [ref]$null\\) | Out-Null; Write-Host '\\\\''SYNTAX OK'\\\\'' } catch { Write-Host \"SYNTAX ERROR: $_\" }')",
       "Bash(powershell.exe -NoProfile -Command \"Get-Command oh-my-posh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
       "Bash(winget install:*)",
       "Bash(powershell.exe -NoProfile -Command 'Install-Module PSReadLine -Force -SkipPublisherCheck -Scope CurrentUser 2>&1; Get-Module -ListAvailable PSReadLine | Sort-Object Version -Descending | Select-Object -First 1 | ForEach-Object { Write-Host \"PSReadLine v$\\($_.Version\\)\" }')",
@@ -30,12 +30,12 @@
       "Bash(powershell.exe -NoProfile -Command \"oh-my-posh init pwsh | Out-String\")",
       "Bash(powershell.exe -NoProfile -Command \"Get-ChildItem 'C:\\\\Users\\\\claud\\\\AppData\\\\Local\\\\Packages\\\\ohmyposh.cli_96v55e8n804z4' -Recurse -Filter 'M365*' -ErrorAction SilentlyContinue | Select-Object FullName\")",
       "Bash(powershell.exe -NoProfile -Command \"Get-ChildItem 'C:\\\\Users\\\\claud\\\\AppData\\\\Local\\\\Packages\\\\ohmyposh.cli_96v55e8n804z4' -Recurse -Directory | Select-Object FullName\")",
-      "Bash(powershell.exe -NoProfile -Command \"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/M365Princess.omp.json' -OutFile 'e:/Powershell/OhMyPosh/themes/M365Princess.omp.json'; Write-Host 'Downloaded'; \\(Get-Item 'e:/Powershell/OhMyPosh/themes/M365Princess.omp.json'\\).Length\")",
-      "Bash(powershell.exe -NoProfile -Command \"Get-Content 'e:/Powershell/OhMyPosh/themes/M365Princess.omp.json' -Raw | ConvertFrom-Json | Select-Object version | Format-List\")",
+      "Bash(powershell.exe -NoProfile -Command \"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/M365Princess.omp.json' -OutFile 'C:/tools/OhMyPosh-Installer/themes/M365Princess.omp.json'; Write-Host 'Downloaded'; \\(Get-Item 'C:/tools/OhMyPosh-Installer/themes/M365Princess.omp.json'\\).Length\")",
+      "Bash(powershell.exe -NoProfile -Command \"Get-Content 'C:/tools/OhMyPosh-Installer/themes/M365Princess.omp.json' -Raw | ConvertFrom-Json | Select-Object version | Format-List\")",
       "Bash(powershell.exe -NoProfile -Command ':*)",
       "Bash(powershell.exe -NoProfile -Command 'Get-Content $PROFILE -Raw')",
       "Bash(pwsh.exe -NoProfile -Command 'Get-Content $PROFILE -Raw')",
-      "Bash(powershell.exe -NoProfile -Command 'try { [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content '\\\\''e:/Powershell/OhMyPosh/Setup-OhMyPosh.ps1'\\\\'' -Raw\\), [ref]$null\\) | Out-Null; Write-Host '\\\\''SYNTAX OK'\\\\'' } catch { Write-Host \"ERROR: $_\" }')",
+      "Bash(powershell.exe -NoProfile -Command 'try { [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content '\\\\''C:/tools/OhMyPosh-Installer/Setup-OhMyPosh.ps1'\\\\'' -Raw\\), [ref]$null\\) | Out-Null; Write-Host '\\\\''SYNTAX OK'\\\\'' } catch { Write-Host \"ERROR: $_\" }')",
       "Bash(powershell.exe -NoProfile -Command \"Get-Variable PROFILE -ValueOnly\")"
     ]
   }
