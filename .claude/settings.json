@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:/tools/OhMyPosh-Installer/Setup-OhMyPosh.ps1\" -SkipFont -SkipClink)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:/tools/OhMyPosh-Installer/Setup-OhMyPosh.ps1\" -Theme \"lightgreen\" -SkipFont -SkipClink)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}
